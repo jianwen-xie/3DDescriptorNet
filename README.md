@@ -16,10 +16,10 @@ pip install numpy scipy
 ## Getting Started
 
 - Clone this repo:
-```bash
-git clone https://github.com/jianwen-xie/3DDescriptorNet.git
-cd 3DDescriptorNet
-```
+    ```bash
+    git clone https://github.com/jianwen-xie/3DDescriptorNet.git
+    cd 3DDescriptorNet
+    ```
 
 - Download [volumetric data](https://drive.google.com/file/d/1fwYcL9KMWW1aX3r6hPCGC7VYpF5BzHjS/view?usp=sharing) and save it to `./data` directory. 
 The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip). We use ***dresser*** as an example for the following experiments.
@@ -27,28 +27,28 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
 ### Exp1: 3D Object synthesis
 
 - Train the synthesis model:
-```bash
-python train.py --category dresser --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
-```
+    ```bash
+    python train.py --category dresser --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
+    ```
 
 - Visualize the generated results using the visualization code in `visualization/visualize.m`, e.g.
-```MATLAB
-addpath('visualization')
-visualize('./output/dresser/synthesis', 'sample2990.mat')
-```
+    ```MATLAB
+    addpath('visualization')
+    visualize('./output/dresser/synthesis', 'sample2990.mat')
+    ```
 
 - Evaluate synthesized results using the evaluation code in `./evaluation`
 
 ### Exp2: 3D object recovery
 
 - Train the recovery model:
-```bash
-python rec_exp.py --category dresser \
-                  --num_epochs 1000 \
-                  --batch_size 50 \
-                  --step_size 0.07 \
-                  --sample_steps 90 
-```
+    ```bash
+    python rec_exp.py --category dresser \
+                      --num_epochs 1000 \
+                      --batch_size 50 \
+                      --step_size 0.07 \
+                      --sample_steps 90 
+    ```
 
 - Test the recovery model:
     1. Download the [incomplete data](https://drive.google.com/open?id=1fwYcL9KMWW1aX3r6hPCGC7VYpF5BzHjS) and save it to `./data` directory. For each category in `volumetric_data`, the 
