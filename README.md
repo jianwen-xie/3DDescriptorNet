@@ -8,7 +8,10 @@ This repository contains a tensorflow implementation for the paper "[Learning De
 ## Requirements
 - Python 2.7 or Python 3.3+
 - [Tensorflow r1.3+](https://www.tensorflow.org/install/)
-- [Scipy](https://www.scipy.org/install.html)
+- Install required python libraries
+```bash
+pip install numpy scipy
+```
 
 ## Usage
 - Clone this repo:
@@ -37,3 +40,4 @@ visualize('./output/night_stand/synthesis', 'sample2990.mat')
         booktitle={The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
         year={2018}
     }
+For any questions, please contact Jianwen Xie (jianwen@ucla.edu) and Zilong Zheng (zilongzheng0318@ucla.edu).
