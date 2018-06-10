@@ -16,5 +16,5 @@ th inception_score.lua -syn_path sample_results.mat
 
 To compute softmax probability on synthesized results for single category (night stand for example), run
 ```bash
-th average_probability.lua -syn_path ../output/night_stand/synthesis/sample2990.mat -class night_stand
+th average_probability.lua -syn_path ../output/dresser/synthesis/sample2990.mat -class dresser
 ```
