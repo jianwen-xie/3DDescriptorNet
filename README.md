@@ -22,28 +22,29 @@ This repository contains a tensorflow implementation for the paper "[Learning De
     ```
 
 - Download [volumetric data](https://drive.google.com/file/d/1fwYcL9KMWW1aX3r6hPCGC7VYpF5BzHjS/view?usp=sharing) and save it to `./data` directory. 
-The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip). We use ***dresser*** as an example for the following experiments.
+The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip). We use **night stand** as an example for the following experiments.
 
 ### Exp1: 3D Object synthesis
 
 - Train the synthesis model:
     ```bash
-    python train.py --category dresser --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
+    python train.py --category night_stand --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
     ```
 
 - Visualize the generated results using the visualization code in `visualization/visualize.m`, e.g.
     ```MATLAB
     addpath('visualization')
-    visualize('./output/dresser/synthesis', 'sample2990.mat')
+    visualize('./output/night_stand/synthesis', 'sample2990.mat')
     ```
 
 - Evaluate synthesized results using the evaluation code in `./evaluation`
 
 ### Exp2: 3D object recovery
+<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/nightstand.jpg" width="400px"/></p>
 
 - Train the recovery model:
     ```bash
-    python rec_exp.py --category dresser \
+    python rec_exp.py --category night_stand \
                       --num_epochs 1000 \
                       --batch_size 50 \
                       --step_size 0.07 \
@@ -55,8 +56,8 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
     incomplete data contains: 1) `incomplete_test.mat`: 70\% randomly corrupted testing data 2) `masks.mat`: The mask to corrupt the testing data. 3. `original_test.mat`: original testing data for comparison.
     2. Run recovery on the corrupted data
     ```bash
-    python rec_exp.py --test --category dresser \
-                      --ckpt ./output/dresser/checkpoint/model.ckpt-990 \
+    python rec_exp.py --test --category night_stand \
+                      --ckpt ./output/night_stand/checkpoint/model.ckpt-990 \
                       --incomp_data_path ./data/incomplete_data \
                       --batch_size 50 \
                       --step_size 0.07 \
