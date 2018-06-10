@@ -8,7 +8,7 @@ This repository contains a tensorflow implementation for the paper "[Learning De
 ## Requirements
 - Python 2.7 or Python 3.3+
 - [Tensorflow r1.3+](https://www.tensorflow.org/install/)
-- Install required python libraries
+- Install required Python libraries
 ```bash
 pip install numpy scipy
 ```
