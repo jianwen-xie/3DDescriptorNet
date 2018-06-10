@@ -3,7 +3,7 @@
 This repository contains a tensorflow implementation for the paper "[Learning Descriptor Networks for 3D Shape Synthesis and Analysis](http://www.stat.ucla.edu/~jxie/3DDescriptorNet/3DDescriptorNet_file/doc/3DDescriptorNet.pdf)
 ". (http://www.stat.ucla.edu/~jxie/3DDescriptorNet/3DDescriptorNet.html)
 
-<img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/syn.jpg" width="900px"/>
+<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/syn.jpg" width="700px"/></p>
 
 ## Requirements
 - Python 2.7 or Python 3.3+
@@ -13,7 +13,7 @@ This repository contains a tensorflow implementation for the paper "[Learning De
 ## Usage
 - Clone this repo:
 ```bash
-git clone https://github.com/jianwen-xie/3DDescriptorNet
+git clone https://github.com/jianwen-xie/3DDescriptorNet.git
 cd 3DDescriptorNet
 ```
 
@@ -30,12 +30,10 @@ addpath('visualization')
 visualize('./output/night_stand/synthesis', 'sample2990.mat')
 ```
 
-    
-
 ## References
     @inproceedings{3DDesNet,
         title={Learning Descriptor Networks for 3D Shape Synthesis and Analysis},
         author={Xie, Jianwen and Zheng, Zilong and Gao, Ruiqi and Wang, Wenguan and Zhu Song-Chun and Wu, Ying Nian},
-        booktitle={Computer Vision and Pattern Recognition (CVPR), 2018 IEEE Conference on},
+        booktitle={The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
         year={2018}
     }
