@@ -9,9 +9,9 @@ This repository contains a tensorflow implementation for the paper "[Learning De
 - Python 2.7 or Python 3.3+
 - [Tensorflow r1.3+](https://www.tensorflow.org/install/)
 - Install required Python libraries
-```bash
-pip install numpy scipy
-```
+    ```bash
+    pip install numpy scipy
+    ```
 
 ## Getting Started
 
@@ -51,12 +51,13 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
     ```
 
 - Test the recovery model:
-    1. Download the [incomplete data](https://drive.google.com/open?id=1fwYcL9KMWW1aX3r6hPCGC7VYpF5BzHjS) and save it to `./data` directory. For each category in `volumetric_data`, the 
+    1. Download the [incomplete data](https://drive.google.com/file/d/1Q-tapylbCcS-i7IWPKNaPG9c4hLfi7I_/view?usp=sharing) and save it to `./data` directory. For each category in `volumetric_data`, the 
     incomplete data contains: 1) `incomplete_test.mat`: 70\% randomly corrupted testing data 2) `masks.mat`: The mask to corrupt the testing data. 3. `original_test.mat`: original testing data for comparison.
     2. Run recovery on the corrupted data
     ```bash
     python rec_exp.py --test \
                       --ckpt ./output/dresser/checkpoint/model.ckpt-990 \
+                      --incomp_data_path ./data/incomplete_data \
                       --category dresser \
                       --batch_size 50 \
                       --step_size 0.07 \
