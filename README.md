@@ -3,7 +3,7 @@
 This repository contains a tensorflow implementation for the paper "[Learning Descriptor Networks for 3D Shape Synthesis and Analysis](http://www.stat.ucla.edu/~jxie/3DDescriptorNet/3DDescriptorNet_file/doc/3DDescriptorNet.pdf)
 ". (http://www.stat.ucla.edu/~jxie/3DDescriptorNet/3DDescriptorNet.html)
 
-<img src="https://github.com/jianwen-xie/3DDescriptorNet/assets/3D_syn.png" width="900px"/>
+<img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/syn.jpg" width="900px"/>
 
 ## Requirements
 - Python 2.7 or Python 3.3+
@@ -17,14 +17,15 @@ git clone https://github.com/jianwen-xie/3DDescriptorNet
 cd 3DDescriptorNet
 ```
 
-- Download ModelNet10 dataset and save it to `./data` directory:
+- Download [volumetric data](https://drive.google.com/file/d/1fwYcL9KMWW1aX3r6hPCGC7VYpF5BzHjS/view?usp=sharing) and save it to `./data` directory:
 
 - Train the synthesis model with ***night_stand*** dataset:
-
-    $ python train.py --category night_stand --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
+```bash
+python train.py --category night_stand --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
+```
 
 - Visualize the generated results in using the visualization code in `visualization/visualize.m`, e.g.
-```matlab
+```MATLAB
 addpath('visualization')
 visualize('./output/night_stand/synthesis', 'sample2990.mat')
 ```
