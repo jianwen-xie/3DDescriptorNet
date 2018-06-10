@@ -55,10 +55,9 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
     incomplete data contains: 1) `incomplete_test.mat`: 70\% randomly corrupted testing data 2) `masks.mat`: The mask to corrupt the testing data. 3. `original_test.mat`: original testing data for comparison.
     2. Run recovery on the corrupted data
     ```bash
-    python rec_exp.py --test \
+    python rec_exp.py --test --category dresser \
                       --ckpt ./output/dresser/checkpoint/model.ckpt-990 \
                       --incomp_data_path ./data/incomplete_data \
-                      --category dresser \
                       --batch_size 50 \
                       --step_size 0.07 \
                       --sample_steps 90 
