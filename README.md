@@ -27,11 +27,13 @@ cd 3DDescriptorNet
 python train.py --category night_stand --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
 ```
 
-- Visualize the generated results in using the visualization code in `visualization/visualize.m`, e.g.
+- Visualize the generated results using the visualization code in `visualization/visualize.m`, e.g.
 ```MATLAB
 addpath('visualization')
 visualize('./output/night_stand/synthesis', 'sample2990.mat')
 ```
+
+- Evaluate synthesized results using the evaluation code in `evaluation/`
 
 ## References
     @inproceedings{3DDesNet,
