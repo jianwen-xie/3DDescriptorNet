@@ -54,10 +54,11 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
 - Test the recovery model:
     1. Download the [incomplete data](https://drive.google.com/file/d/1Q-tapylbCcS-i7IWPKNaPG9c4hLfi7I_/view?usp=sharing) and save it to `./data` directory. For each category in `volumetric_data`, the 
     incomplete data contains: 1) `incomplete_test.mat`: 70\% randomly corrupted testing data 2) `masks.mat`: The mask to corrupt the testing data. 3. `original_test.mat`: original testing data for comparison.
+    2. You can download our [pretrained model](https://drive.google.com/file/d/1cm8Q8JaLBf8h76g1bfnjWBl6tZmbZOuL/view?usp=sharing) to test recovery.
     2. Run recovery on the corrupted data
     ```bash
     python rec_exp.py --test --category night_stand \
-                      --ckpt ./output/night_stand/checkpoint/model.ckpt-990 \
+                      --ckpt ./recovery_model/night_stand/night_stand.ckpt \
                       --incomp_data_path ./data/incomplete_data \
                       --batch_size 50 \
                       --step_size 0.07 \
