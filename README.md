@@ -21,17 +21,17 @@ This repository contains a tensorflow implementation for the paper "[Learning De
     cd 3DDescriptorNet
     ```
 
-- Download [volumetric data](https://drive.google.com/file/d/1fwYcL9KMWW1aX3r6hPCGC7VYpF5BzHjS/view?usp=sharing) and save it to `./data` directory. 
-The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip). We use **night stand** as an example for the following experiments.
+- Download [volumetric data](https://drive.google.com/file/d/0B9FKAOJSlMq0Vnl2WlN3eU40RGs/view?usp=sharing) and save it to `./data` directory. 
+The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip).
 
 ### Exp1: 3D Object synthesis
 
-- Train the synthesis model:
+- Train the synthesis model on **night stand** category:
     ```bash
     python train.py --category night_stand --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
     ```
 
-- Visualize the generated results using the visualization code in `visualization/visualize.m`, e.g.
+- Visualize the generated results using the *MATLAB* code in `visualization/visualize.m`, e.g.
     ```MATLAB
     addpath('visualization')
     visualize('./output/night_stand/synthesis', 'sample2990.mat')
@@ -39,12 +39,14 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
 
 - Evaluate synthesized results using the evaluation code in `./evaluation`
 
-### Exp2: 3D object recovery
-<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/nightstand.jpg" width="400px"/></p>
+- You can download our [synthesized results](https://drive.google.com/file/d/1o1Q_DEE4YPVVl89_vPYVJrPTmOh5gZdq/view?usp=sharing) and test on it.
 
-- Train the recovery model:
+### Exp2: 3D object recovery
+<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/sofa.jpg" width="400px"/></p>
+
+- Train the recovery model on **sofa** category:
     ```bash
-    python rec_exp.py --category night_stand \
+    python rec_exp.py --category sofa \
                       --num_epochs 1000 \
                       --batch_size 50 \
                       --step_size 0.07 \
@@ -57,12 +59,37 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
     2. You can download our [pretrained model](https://drive.google.com/file/d/1cm8Q8JaLBf8h76g1bfnjWBl6tZmbZOuL/view?usp=sharing) to test recovery.
     2. Run recovery on the corrupted data
     ```bash
-    python rec_exp.py --test --category night_stand \
-                      --ckpt ./recovery_model/night_stand/night_stand.ckpt \
+    python rec_exp.py --test --category sofa \
+                      --ckpt ./recovery_model/sofa/sofa.ckpt \
                       --incomp_data_path ./data/incomplete_data \
                       --batch_size 50 \
                       --step_size 0.07 \
                       --sample_steps 90 
+    ```
+
+### Exp3: 3D object super resolution
+<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/3D_sr.jpg" width="400px"/></p>
+
+- Train the super resolution model on **toilet** category:
+    ```bash
+    python sr_exp.py --category toilet \
+                      --cube_len 64 \
+                      --scale 4 \
+                      --num_epochs 500 \
+                      --batch_size 50 \
+                      --step_size 0.01 \
+                      --sample_steps 10 
+    ```
+
+- Test the super resolution model:
+    ```bash
+    python rec_exp.py --test --category toilet \
+                      --ckpt ./recovery_model/sofa/sofa.ckpt \
+                      --cube_len 64 \
+                      --scale 4 \
+                      --batch_size 50 \
+                      --step_size 0.01 \
+                      --sample_steps 10 
     ```
 
 

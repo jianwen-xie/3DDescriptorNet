@@ -15,7 +15,7 @@ tf.flags.DEFINE_integer('log_step', 10, 'Number of epochs to save output results
 # testing hyper-parameters
 tf.flags.DEFINE_boolean('test', False, 'True if in testing mode')
 tf.flags.DEFINE_string('ckpt', None, 'Checkpoint path to load')
-tf.flags.DEFINE_integer('test_size', 100, 'Number of maximum testing data')
+tf.flags.DEFINE_integer('test_size', None, 'Number of maximum testing data')
 
 # data hyper-parameters
 tf.flags.DEFINE_string('category', 'toilet', 'Name of subcategory in dataset')
