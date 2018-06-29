@@ -58,14 +58,23 @@ def getObj(data_path, obj='chair', train=True, num_voxels=None, cube_len=64, low
     print('Loading {}, shape: {}'.format(obj, volumeBatch.shape))
     return volumeBatch
 
-
-def getAll(data_path, train=True, cube_len=64):
+def getAll(data_path, train=True, cube_len=64, num_voxels=None, low_bound=0, up_bound=1):
     print('Loading all data sets......')
     objList = [obj for obj in os.listdir(data_path)]
-    volumeBatch = np.concatenate([getObj(data_path, obj, train, cube_len=cube_len) for obj in objList], axis=0)
-    np.random.shuffle(volumeBatch)
-    print('All data sets loaded, shape: ', volumeBatch.shape)
-    return volumeBatch.astype(float)
+    volumeBatch = []
+    labels = []
+    for c, obj in enumerate(objList):
+        data = getObj(data_path, obj, train, cube_len=cube_len, num_voxels=num_voxels,
+                      low_bound=low_bound, up_bound=up_bound)
+        volumeBatch.append(data)
+        labels.append(np.ones(data.shape[0], dtype=int) * c)
+    volumeBatch = np.concatenate(volumeBatch, axis=0)
+    labels = np.concatenate(labels, axis=0)
+    shuffle_idx = np.random.permutation(np.arange(len(volumeBatch)))
+    volumeBatch = volumeBatch[shuffle_idx]
+    labels = labels[shuffle_idx]
+    print('All data sets loaded, data shape: {}, labels shape {}'.format(len(volumeBatch), len(labels)))
+    return volumeBatch.astype(float), labels.astype(int)
 
 def reshape_data(data_dir, filename, rand_voxels=None):
     voxels = getVoxelsFromMat(os.path.join(data_dir, filename), 'voxels')

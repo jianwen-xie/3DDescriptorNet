@@ -32,7 +32,7 @@ for f = 1:num_figures
         lighting gouraud;
         axis off;
     end
-    name_saved = sprintf('sample_%03d.png', f);
+    name_saved = sprintf('test_%03d.png', f);
     saveas(fig, [file_dir '/visualize/' filename(1:end-4) '/' name_saved]);
     if f == 1
             saveas(fig, [file_dir '/visualize/' filename(1:end-4) '.png']);

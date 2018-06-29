@@ -160,6 +160,9 @@ def train():
                   % (epoch, des_loss_avg, mse, end_time-start_time))
             writer.add_summary(summary, epoch)
 
+            if mse > 2 or np.isnan(mse):
+                break
+
             if epoch % FLAGS.log_step == 0:
                 if not os.path.exists(synthesis_dir):
                     os.makedirs(synthesis_dir)
