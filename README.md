@@ -68,7 +68,7 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
     ```
 
 ### Exp3: 3D object super resolution
-<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/3D_sr.jpg" width="400px"/></p>
+<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/3D_sr.png" width="400px"/></p>
 
 - Train the super resolution model on **toilet** category:
     ```bash
@@ -84,7 +84,7 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
 - Test the super resolution model:
     ```bash
     python rec_exp.py --test --category toilet \
-                      --ckpt ./recovery_model/sofa/sofa.ckpt \
+                      --ckpt ./output/toilet/checkpoints/model.ckpt-490 \
                       --cube_len 64 \
                       --scale 4 \
                       --batch_size 50 \
