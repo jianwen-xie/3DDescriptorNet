@@ -24,14 +24,16 @@ This repository contains a tensorflow implementation for the paper "[Learning De
 - Download [volumetric data](https://drive.google.com/file/d/0B9FKAOJSlMq0Vnl2WlN3eU40RGs/view?usp=sharing) and save it to `./data` directory. 
 The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip).
 
-### Exp1: 3D Object synthesis
+- Download [pretrained models](https://drive.google.com/file/d/1vrusnKb_Mqu4khRJHx4DdQ468dnoiKpb/view?usp=sharing) and save it to the cloned directory.
+
+### Exp1: 3D object synthesis
 
 - Train the synthesis model on **night stand** category:
     ```bash
     python train.py --category night_stand --data_dir ./data/volumetric_data/ModelNet10 --output_dir ./output
     ```
 
-- Visualize the generated results using the *MATLAB* code in `visualization/visualize.m`, e.g.
+- Visualize the generated results using the **MATLAB** code in `visualization/visualize.m`, e.g.
     ```MATLAB
     addpath('visualization')
     visualize('./output/night_stand/synthesis', 'sample2990.mat')
