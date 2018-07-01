@@ -106,7 +106,7 @@ The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dsha
 |      3D-GAN     |      91.0%     |
 | 3D DescriptorNet (ours) | **92.4%**  |
 
-- Train Classification using Logistic Regression:
+- Train Classification using Logistic Regression ([pretrained model](https://drive.google.com/file/d/1vrusnKb_Mqu4khRJHx4DdQ468dnoiKpb/view?usp=sharing)):
     ```bash
     python train_classification.py --classifier_type logistic --ckpt pretrained_models/classification/model.ckpt
     
