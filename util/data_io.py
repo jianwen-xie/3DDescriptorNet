@@ -2,10 +2,12 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-
+import time
 import scipy.io as io
 import numpy as np
+import random
 import scipy.ndimage as nd
+import matplotlib.pyplot as plt
 
 DATA_PATH = './volumetric_data/ModelNet10/'
 
@@ -94,3 +96,14 @@ def reshape_data(data_dir, filename, rand_voxels=None):
     new_voxel = np.array(new_voxel > 0.5).astype(float)
     saveVoxelsToMat(new_voxel, os.path.join(data_dir, 'syn_results.mat'), 'v')
 
+def draw_graph(plt, results, title='', output_dir='', clr='r', show=True, write_log=True):
+    plt.plot(results, 'r')
+    plt.title(title)
+
+    if show:
+        plt.draw()
+    if write_log:
+        with open(output_dir + '/' + title + '.log', "w") as f:
+            f.write(str(results))
+
+    plt.savefig(output_dir + '/' + title + '.png')

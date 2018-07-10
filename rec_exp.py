@@ -4,6 +4,7 @@ from __future__ import print_function
 import math
 import os
 import time
+import matplotlib.pyplot as plt
 from scipy import io
 from config import FLAGS
 from util import data_io
@@ -64,16 +65,10 @@ def train():
     obs_res = descriptor(obs, reuse=False)
     syn_res = descriptor(syn, reuse=True)
 
-    recon_err_mean, recon_err_update = tf.contrib.metrics.streaming_mean_squared_error(
-        tf.reduce_mean(syn, axis=0), tf.reduce_mean(obs, axis=0))
-
+    recon_err = tf.square(tf.reduce_mean(syn, axis=0) - tf.reduce_mean(obs, axis=0))
     des_loss = tf.subtract(tf.reduce_mean(syn_res, axis=0), tf.reduce_mean(obs_res, axis=0))
-    des_loss_mean, des_loss_update = tf.contrib.metrics.streaming_mean(des_loss)
 
     syn_langevin = langevin_dynamics(syn)
-
-    tf.summary.scalar('des_loss', des_loss_mean)
-    tf.summary.scalar('recon_err', recon_err_mean)
 
     train_data = data_io.getObj(FLAGS.data_path, FLAGS.category, train=True, cube_len=cube_len,
                                 num_voxels=FLAGS.train_size, low_bound=0, up_bound=1)
@@ -87,10 +82,6 @@ def train():
     train_data = train_data[..., np.newaxis]
     incomplete_data = incomplete_data[..., np.newaxis]
     masks = masks[..., np.newaxis]
-
-    if tf.gfile.Exists(log_dir):
-        tf.gfile.DeleteRecursively(log_dir)
-    tf.gfile.MakeDirs(log_dir)
 
     data_io.saveVoxelsToMat(train_data, "%s/observed_data.mat" % output_dir, cmin=0, cmax=1)
     data_io.saveVoxelsToMat(incomplete_data, "%s/incomplete_data.mat" % output_dir, cmin=0, cmax=1)
@@ -109,21 +100,22 @@ def train():
     # update by mean of gradients
     apply_d_grads = des_optim.apply_gradients(des_grads_vars)
 
-    summary_op = tf.summary.merge_all()
-
     with tf.Session() as sess:
         # initialize training
         sess.run(tf.global_variables_initializer())
-        sess.run(tf.local_variables_initializer())
 
         saver = tf.train.Saver(max_to_keep=50)
 
-        writer = tf.summary.FileWriter(log_dir, sess.graph)
-
         recover_voxels = np.random.randn(num_voxels, cube_len, cube_len, cube_len, 1)
 
+        des_loss_epoch = []
+        recon_err_epoch = []
+        plt.ion()
+
         for epoch in range(FLAGS.num_epochs):
-            d_grad_acc = []
+            d_grad_vec = []
+            des_loss_vec = []
+            recon_err_vec = []
 
             init_data = incomplete_data.copy()
             start_time = time.time()
@@ -138,21 +130,24 @@ def train():
                 syn_data = sample * (1 - data_mask) + syn_data * data_mask
 
                 # learn D net
-                d_grad = \
-                    sess.run([des_grads, des_loss_update, apply_d_grads], feed_dict={obs: obs_data, syn: syn_data})[0]
+                d_grad, d_loss = \
+                    sess.run([des_grads, des_loss, apply_d_grads], feed_dict={obs: obs_data, syn: syn_data})[:2]
 
-                d_grad_acc.append(d_grad)
-
+                d_grad_vec.append(d_grad)
+                des_loss_vec.append(d_loss)
                 # Compute MSE
-                sess.run(recon_err_update, feed_dict={obs: obs_data, syn: syn_data})
-
+                mse = sess.run(recon_err, feed_dict={obs: obs_data, syn: syn_data})
+                recon_err_vec.append(mse)
                 recover_voxels[indices] = syn_data
 
-            [des_loss_avg, mse, summary] = sess.run([des_loss_mean, recon_err_mean, summary_op])
             end_time = time.time()
-            print('Epoch #%d, descriptor loss: %.4f, descriptor SSD weight: %.4f, Avg MSE: %4.4f, time: %.2f'
-                  % (epoch, des_loss_avg, float(np.mean(d_grad_acc)), mse, end_time - start_time))
-            writer.add_summary(summary, epoch)
+            d_grad_mean, des_loss_mean, recon_err_mean = float(np.mean(d_grad_vec)), float(np.mean(des_loss_vec)), \
+                                                         float(np.mean(recon_err_vec))
+            des_loss_epoch.append(des_loss_mean)
+            recon_err_epoch.append(recon_err_mean)
+            print('Epoch #%d, descriptor loss: %.4f, descriptor SSD weight: %.4f, Avg MSE: %4.4f, time: %.2fs'
+                  % (epoch, des_loss_mean, d_grad_mean, recon_err_mean,
+                     end_time - start_time))
 
             if epoch % FLAGS.log_step == 0:
                 if not os.path.exists(synthesis_dir):
@@ -163,6 +158,12 @@ def train():
                     os.makedirs(checkpoint_dir)
                 saver.save(sess, "%s/%s" % (checkpoint_dir, 'model.ckpt'), global_step=epoch)
 
+                if not os.path.exists(log_dir):
+                    os.makedirs(log_dir)
+                plt.figure(1)
+                data_io.draw_graph(plt, des_loss_epoch, 'des_loss', log_dir, 'r')
+                plt.figure(2)
+                data_io.draw_graph(plt, recon_err_epoch, 'recon_error', log_dir, 'b')
 
 def test():
     assert FLAGS.ckpt != None, 'no model provided.'

@@ -5,6 +5,7 @@ import os
 import time
 from config import FLAGS
 from util import data_io
+import matplotlib.pyplot as plt
 from util.custom_ops import *
 
 tf.flags.DEFINE_integer('scale', 4, 'Upsampling scale for super resolution.')
@@ -31,7 +32,12 @@ def descriptor(inputs, reuse=False):
         conv1 = tf.nn.relu(conv1)
         print conv1
 
-        fc = fully_connected(conv1, 1, name="fc")
+        conv2 = conv3d(conv1, 100, kernal=(6, 6, 6), strides=(2, 2, 2), padding="SAME", name="conv2")
+        conv2 = tf.nn.relu(conv2)
+        print conv2
+
+
+        fc = fully_connected(conv2, 1, name="fc")
         print fc
 
         return fc
@@ -74,17 +80,12 @@ def train():
     syn_res = descriptor(syn, reuse=True)
     sr_res = obs + syn - avg_pool(syn, scale)
 
-    recon_err_mean, recon_err_update = tf.contrib.metrics.streaming_mean_squared_error(
-        tf.reduce_mean(syn, axis=0), tf.reduce_mean(obs, axis=0))
+    recon_err = tf.square(tf.reduce_mean(syn, axis=0) - tf.reduce_mean(obs, axis=0))
 
     des_loss = tf.subtract(tf.reduce_mean(syn_res, axis=0), tf.reduce_mean(obs_res, axis=0))
-    des_loss_mean, des_loss_update = tf.contrib.metrics.streaming_mean(des_loss)
     dLdI = tf.gradients(syn_res, syn)[0]
 
     syn_langevin = langevin_dynamics(syn)
-
-    tf.summary.scalar('des_loss', des_loss_mean)
-    tf.summary.scalar('recon_err', recon_err_mean)
 
     train_data = data_io.getObj(FLAGS.data_path, FLAGS.category, cube_len=cube_len, num_voxels=FLAGS.train_size)
     num_voxels = len(train_data)
@@ -105,16 +106,12 @@ def train():
     des_grads = [tf.reduce_mean(tf.abs(grad)) for (grad, var) in des_grads_vars if '/w' in var.name]
     apply_d_grads = des_optim.apply_gradients(des_grads_vars)
 
-    summary_op = tf.summary.merge_all()
 
     saver = tf.train.Saver(max_to_keep=50)
 
     with tf.Session() as sess:
         # initialize training
         sess.run(tf.global_variables_initializer())
-        sess.run(tf.local_variables_initializer())
-
-        writer = tf.summary.FileWriter(log_dir, sess.graph)
 
         print('Generating low resolution data')
         up_samples = np.zeros(train_data.shape)
@@ -137,7 +134,13 @@ def train():
         print('start training')
         sample_voxels = np.random.randn(num_voxels, cube_len, cube_len, cube_len, 1)
 
+        des_loss_epoch = []
+        recon_err_epoch = []
+        plt.ion()
+
         for epoch in range(FLAGS.num_epochs):
+            des_loss_vec = []
+            recon_err_vec = []
 
             start_time = time.time()
             for i in range(num_batches):
@@ -148,17 +151,21 @@ def train():
                 sr = sess.run(syn_langevin, feed_dict={syn: us_data})
 
                 # learn D net
-                sess.run([des_loss_update, apply_d_grads], feed_dict={obs: obs_data, syn: sr})
+                d_loss = sess.run([des_loss, apply_d_grads], feed_dict={obs: obs_data, syn: sr})[0]
                 # Compute MSE
-                sess.run(recon_err_update, feed_dict={obs: obs_data, syn: sr})
+                mse = sess.run(recon_err, feed_dict={obs: obs_data, syn: sr})
+                recon_err_vec.append(mse)
+                des_loss_vec.append(d_loss)
 
                 sample_voxels[indices] = sr
 
-            [des_loss_avg, mse, summary] = sess.run([des_loss_mean, recon_err_mean, summary_op])
             end_time = time.time()
+            des_loss_mean, recon_err_mean = float(np.mean(des_loss_vec)), float(np.mean(recon_err_vec))
+            des_loss_epoch.append(des_loss_mean)
+            recon_err_epoch.append(recon_err_mean)
+
             print('Epoch #%d, descriptor loss: %.4f, avg MSE: %4.4f, time:%.2fs'
-                  % (epoch, des_loss_avg, mse, end_time-start_time))
-            writer.add_summary(summary, epoch)
+                  % (epoch, des_loss_mean, recon_err_mean, end_time-start_time))
 
             if mse > 2 or np.isnan(mse):
                 break
@@ -171,6 +178,13 @@ def train():
                 if not os.path.exists(checkpoint_dir):
                     os.makedirs(checkpoint_dir)
                 saver.save(sess, "%s/%s" % (checkpoint_dir, 'model.ckpt'), global_step=epoch)
+
+                if not os.path.exists(log_dir):
+                    os.makedirs(log_dir)
+                plt.figure(1)
+                data_io.draw_graph(plt, des_loss_epoch, 'des_loss', log_dir, 'r')
+                plt.figure(2)
+                data_io.draw_graph(plt, recon_err_epoch, 'recon_error', log_dir, 'b')
 
 def test():
     assert FLAGS.ckpt != None, 'no model provided.'

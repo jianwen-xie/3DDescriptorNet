@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import os
 import argparse
+import matplotlib.pyplot as plt
 import math
 import time
 import numpy as np
@@ -58,17 +59,20 @@ def main(_):
     with tf.Session() as sess:
 
         sess.run(tf.global_variables_initializer())
-        sess.run(tf.local_variables_initializer())
 
         sample_size = FLAGS.sample_batch * FLAGS.num_batches
         sample_voxels = np.random.randn(sample_size, FLAGS.cube_len, FLAGS.cube_len, FLAGS.cube_len, 1)
 
         saver = tf.train.Saver(max_to_keep=50)
 
-        writer = tf.summary.FileWriter(log_dir, sess.graph)
+        des_loss_epoch = []
+        rec_err_epoch = []
+        plt.ion()
 
         for epoch in range(FLAGS.num_epochs):
-            d_grad_acc = []
+            d_grad_vec = []
+            des_loss_vec = []
+            rec_err_vec = []
 
             start_time = time.time()
 
@@ -86,24 +90,28 @@ def main(_):
                     syn = sess.run(net.langevin_descriptor, feed_dict={net.syn: syn_data})
 
                 # learn D net
-                d_grad = sess.run([net.des_grads, net.des_loss_update, net.update_d_grads, net.sample_loss_update],
-                                       feed_dict={net.obs: obs_data, net.syn: syn})[0]
+                des_grads, des_loss = sess.run([net.des_grads, net.des_loss, net.update_d_grads],
+                                                            feed_dict={net.obs: obs_data, net.syn: syn})[:2]
 
-                d_grad_acc.append(d_grad)
+                d_grad_vec.append(des_grads)
+                des_loss_vec.append(des_loss)
 
                 # Compute L2 distance
-                sess.run(net.recon_err_update, feed_dict={net.obs: obs_data, net.syn: syn})
+                rec_err = sess.run(net.recon_err, feed_dict={net.obs: obs_data, net.syn: syn})
+                rec_err_vec.append(rec_err)
 
                 sample_voxels[i * FLAGS.sample_batch:(i + 1) * FLAGS.sample_batch] = syn
 
             sess.run(net.apply_d_grads)
-            [des_loss_avg, sample_loss_avg, mse, summary] = sess.run([net.des_loss_mean, net.sample_loss_mean,
-                                                                      net.recon_err_mean, net.summary_op])
+            d_grad_mean, des_loss_mean, rec_err_mean = float(np.mean(d_grad_vec)), float(np.mean(des_loss_vec)), \
+                                                         float(np.mean(rec_err_vec))
+            des_loss_epoch.append(des_loss_mean)
+            rec_err_epoch.append(rec_err_mean)
+
             end_time = time.time()
 
-            print('Epoch #%d, descriptor loss: %.4f, descriptor SSD weight: %.4f, sample loss: %.4f, Avg MSE: %4.4f, time: %.2fs'
-                  % (epoch, des_loss_avg, float(np.mean(d_grad_acc)), sample_loss_avg, mse, end_time - start_time))
-            writer.add_summary(summary, epoch)
+            print('Epoch #%d, descriptor loss: %.4f, descriptor SSD weight: %.4f, Avg MSE: %4.4f, time: %.2fs'
+                  % (epoch, des_loss_mean, d_grad_mean, rec_err_mean, end_time - start_time))
 
             if epoch % FLAGS.log_step == 0:
                 if not os.path.exists(sample_dir):
@@ -114,6 +122,13 @@ def main(_):
                 if not os.path.exists(model_dir):
                     os.makedirs(model_dir)
                 saver.save(sess, "%s/%s" % (model_dir, 'net.ckpt'), global_step=epoch)
+
+                if not os.path.exists(log_dir):
+                    os.makedirs(log_dir)
+                plt.figure(1)
+                data_io.draw_graph(plt, des_loss_epoch, 'des_loss', log_dir, 'r')
+                plt.figure(2)
+                data_io.draw_graph(plt, rec_err_epoch, 'recon_error', log_dir, 'b')
 
 
 if __name__ == '__main__':

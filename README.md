@@ -3,7 +3,7 @@
 This repository contains a tensorflow implementation for the paper "[Learning Descriptor Networks for 3D Shape Synthesis and Analysis](http://www.stat.ucla.edu/~jxie/3DDescriptorNet/3DDescriptorNet_file/doc/3DDescriptorNet.pdf)
 ". (http://www.stat.ucla.edu/~jxie/3DDescriptorNet/3DDescriptorNet.html)
 
-<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/syn.jpg" width="700px"/></p>
+<p align="center"><img src="http://www.stat.ucla.edu/~jxie/3DDescriptorNet/files/3D_syn.png" width="700px"/></p>
 
 ## Requirements
 - Python 2.7 or Python 3.3+

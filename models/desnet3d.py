@@ -60,11 +60,8 @@ class DescriptorNet3D(object):
     def build_model(self):
         obs_res = self.descriptor(self.obs, reuse=False)
         syn_res = self.descriptor(self.syn, reuse=True)
-        sample_loss = tf.reduce_sum(syn_res)
-        self.sample_loss_mean, self.sample_loss_update = tf.contrib.metrics.streaming_mean(sample_loss)
 
-        self.recon_err_mean, self.recon_err_update = tf.contrib.metrics.streaming_mean_squared_error(
-            tf.reduce_mean(self.syn, axis=0), tf.reduce_mean(self.obs, axis=0))
+        self.recon_err = tf.square(tf.reduce_mean(self.syn, axis=0) - tf.reduce_mean(self.obs, axis=0))
 
         self.langevin_descriptor = self.langevin_dynamics(self.syn, False)
         self.langevin_descriptor_noise = self.langevin_dynamics(self.syn, True)
@@ -75,11 +72,10 @@ class DescriptorNet3D(object):
 
         # initialize training
 
-        des_loss = tf.subtract(tf.reduce_mean(syn_res, axis=0), tf.reduce_mean(obs_res, axis=0))
-        self.des_loss_mean, self.des_loss_update = tf.contrib.metrics.streaming_mean(des_loss)
+        self.des_loss = tf.subtract(tf.reduce_mean(syn_res, axis=0), tf.reduce_mean(obs_res, axis=0))
 
         des_optim = tf.train.AdamOptimizer(self.d_lr, beta1=self.beta1)
-        des_grads_vars = des_optim.compute_gradients(des_loss, var_list=des_vars)
+        des_grads_vars = des_optim.compute_gradients(self.des_loss, var_list=des_vars)
         self.des_grads = [tf.reduce_mean(tf.abs(grad)) for (grad, var) in des_grads_vars if '/w' in var.name]
         self.update_d_grads = [accum_des_vars[i].assign_add(gv[0]) for i, gv in enumerate(des_grads_vars)]
         # update by mean of gradients
@@ -87,9 +83,3 @@ class DescriptorNet3D(object):
                                                    for i, gv in enumerate(des_grads_vars)])
 
         self.reset_grads = [var.assign(tf.zeros_like(var)) for var in accum_des_vars]
-
-        tf.summary.scalar('des_loss', self.des_loss_mean)
-        tf.summary.scalar('sample_loss', self.sample_loss_mean)
-        tf.summary.scalar('recon_err', self.recon_err_mean)
-
-        self.summary_op = tf.summary.merge_all()
