@@ -1,0 +1,4 @@
+[submodule "liblinear"]
+	path = liblinear
+	url = https://github.com/cjlin1/liblinear
+	branch = master
