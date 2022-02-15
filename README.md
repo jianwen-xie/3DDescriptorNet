@@ -21,7 +21,7 @@ This repository contains a tensorflow implementation for the paper "[Learning De
     cd 3DDescriptorNet
     ```
 
-- Download [volumetric data](https://drive.google.com/file/d/0B9FKAOJSlMq0Vnl2WlN3eU40RGs/view?usp=sharing) and save it to `./data` directory. 
+- Download [volumetric data](https://drive.google.com/file/d/0B9FKAOJSlMq0Vnl2WlN3eU40RGs/view?usp=sharing&resourcekey=0-3HwJzcz8SGKzcEoenIIb_Q) and save it to `./data` directory. 
 The dataset contains 10 categories of voxelizations of [ModelNet10](http://3dshapenets.cs.princeton.edu/ModelNet10.zip).
 
 - Download [pretrained models](https://drive.google.com/file/d/1vrusnKb_Mqu4khRJHx4DdQ468dnoiKpb/view?usp=sharing) and save it to the cloned directory.
